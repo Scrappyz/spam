@@ -5,10 +5,12 @@ sys.path.append(str(pathlib.Path(__file__).parents[1].joinpath("project").resolv
 import spam
 
 class TestSpam(unittest.TestCase):
-    def test_convertFrequency(self):
-        self.assertEqual(spam.convertFrequency("100sec"), 100)
-        self.assertEqual(spam.convertFrequency("100"), 100)
-        self.assertEqual(spam.convertFrequency("1hour"), 3600)
+    def test_convertInterval(self):
+        self.assertEqual(spam.convertInterval("100sec"), 100)
+        self.assertEqual(spam.convertInterval("100"), 100)
+        self.assertEqual(spam.convertInterval("1hour"), 3600)
+        self.assertEqual(spam.convertInterval("100ms"), 100/1000)
+        self.assertEqual(spam.convertInterval("1m"), 60)
         
 if __name__ == "__main__":
     unittest.main()

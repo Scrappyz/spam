@@ -3,26 +3,34 @@ import time
 import pyautogui
 import argparse
 
-def convertFrequency(freq: str) -> int:
+def convertInterval(freq: str) -> float:
     t = ""
     unit = ""
     for i in range(len(freq)):
-        if (not freq[i].isdigit() and freq[i] != ' ') or i == len(freq)-1:
+        if not freq[i].isdigit() and freq[i] != ' ':
+            t = freq[:i]
+            unit = freq[i:]
+            break
+        if i == len(freq)-1:
+            i += 1
             t = freq[:i]
             unit = freq[i:]
             break
     
-    t = int(t)
-    if unit.startswith("min"):
+    t = float(t)
+    if unit.startswith("ms"):
+        t /= 1000
+    elif unit.startswith("m"):
         t *= 60
-    elif unit.startswith("hour"):
+    elif unit.startswith("h"):
         t *= 60*60
     
     return t
     
-def spam(url: str, message: str, frequency: int):
-    webbrowser.open(url)
-    time.sleep(10)
+def spam(url: str, message: str, frequency: float, delay: float):
+    if url:
+        webbrowser.open(url)
+    time.sleep(delay)
     while True:
         pyautogui.typewrite(message)
         pyautogui.press("enter")
@@ -30,18 +38,20 @@ def spam(url: str, message: str, frequency: int):
     
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-u", "--url", nargs=1, type=str, help="the url to send the message to", dest="url")
+    parser.add_argument("-u", "--url", nargs="?", type=str, default="", help="the url to send the message to", dest="url")
     parser.add_argument("-m", "--message", nargs=1, type=str, help="the message to send", dest="message")
-    parser.add_argument("-f", "--frequency", nargs=1, help="the delay between each message", dest="frequency")
+    parser.add_argument("-f", "--frequency", nargs="?", type=str, default="5", help="the delay between each message", dest="frequency")
+    parser.add_argument("-d", "--delay", nargs="?", type=str, default="5", help="the delay before spamming", dest="delay")
     
     args = parser.parse_args()
-    url = args.url[0]
+    print(args)
+    url = args.url
     message = args.message[0]
-    frequency = args.frequency[0]
+    frequency = convertInterval(args.frequency)
+    delay = convertInterval(args.delay)
 
-    frequency = convertFrequency(frequency)
     print("Press Ctrl + C to end program")
-    #spam(url, message, frequency)
+    spam(url, message, frequency, delay)
     
 if __name__ == "__main__":
     try:
